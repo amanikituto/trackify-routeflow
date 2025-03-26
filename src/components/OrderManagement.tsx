@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   PackageOpen,
@@ -21,7 +20,7 @@ import { orders, filterOrders, Order } from '@/data/orderData';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { 
   Form, 
   FormControl, 
@@ -30,7 +29,6 @@ import {
   FormLabel 
 } from '@/components/ui/form';
 
-// Define the form values type
 interface OrderFormValues {
   customer: string;
   items: number;
@@ -46,9 +44,9 @@ const OrderManagement = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [displayedOrders, setDisplayedOrders] = useState<Order[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
   
-  // Initialize the form
   const form = useForm<OrderFormValues>({
     defaultValues: {
       customer: '',
@@ -63,20 +61,49 @@ const OrderManagement = () => {
   const totalPages = Math.ceil(orders.length / ordersPerPage);
 
   useEffect(() => {
+    const searchTimer = setTimeout(() => {
+      performSearch();
+      setIsSearching(false);
+    }, 300);
+
+    return () => clearTimeout(searchTimer);
+  }, [searchQuery, selectedFilter, currentPage]);
+
+  const performSearch = () => {
     const filtered = filterOrders(orders, selectedFilter).filter(
       order => order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
               order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
               order.address.toLowerCase().includes(searchQuery.toLowerCase())
     );
     
+    const filteredTotalPages = Math.ceil(filtered.length / ordersPerPage);
+    
+    if (currentPage > filteredTotalPages && filteredTotalPages > 0) {
+      setCurrentPage(1);
+    }
+    
     const startIndex = (currentPage - 1) * ordersPerPage;
     const endIndex = startIndex + ordersPerPage;
     setDisplayedOrders(filtered.slice(startIndex, endIndex));
-  }, [selectedFilter, searchQuery, currentPage]);
+  };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+    setIsSearching(true);
     setCurrentPage(1);
+  };
+
+  const clearSearch = () => {
+    if (searchQuery) {
+      setSearchQuery('');
+      setIsSearching(true);
+      setCurrentPage(1);
+      
+      toast({
+        title: "Search Cleared",
+        description: "Showing all orders",
+      });
+    }
   };
 
   const handleStatusChange = (order: Order, newStatus: Order['status']) => {
@@ -308,7 +335,13 @@ const OrderManagement = () => {
         <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-medium">Order List</h3>
-            <span className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary">{orders.length} results</span>
+            <span className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary">
+              {filterOrders(orders, selectedFilter).filter(
+                order => order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        order.address.toLowerCase().includes(searchQuery.toLowerCase())
+              ).length} results
+            </span>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4">
@@ -321,6 +354,14 @@ const OrderManagement = () => {
                 onChange={handleSearch}
                 className="w-full sm:w-[250px] rounded-md bg-muted/30 border py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
               />
+              {searchQuery && (
+                <button 
+                  className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={clearSearch}
+                >
+                  <XCircle size={16} />
+                </button>
+              )}
             </div>
             
             <div className="flex items-center gap-2">
@@ -353,110 +394,142 @@ const OrderManagement = () => {
         </div>
         
         <div className="overflow-auto">
-          <table className="w-full min-w-[800px]">
-            <thead>
-              <tr className="text-left border-b">
-                <th className="pb-3 font-medium text-sm">Order ID</th>
-                <th className="pb-3 font-medium text-sm">Customer</th>
-                <th className="pb-3 font-medium text-sm">Items</th>
-                <th className="pb-3 font-medium text-sm">Delivery Address</th>
-                <th className="pb-3 font-medium text-sm">Status</th>
-                <th className="pb-3 font-medium text-sm">Scheduled</th>
-                <th className="pb-3 font-medium text-sm">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedOrders.map((order, index) => (
-                <tr key={order.id} className="border-b last:border-0 hover:bg-accent/20 transition-colors">
-                  <td className="py-3 text-sm font-medium">
-                    {order.id}
-                  </td>
-                  <td className="py-3 text-sm">
-                    {order.customer}
-                  </td>
-                  <td className="py-3 text-sm">
-                    {order.items} items
-                  </td>
-                  <td className="py-3 text-sm">
-                    {order.address}
-                  </td>
-                  <td className="py-3 text-sm">
-                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(order.status)}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="py-3 text-sm">
-                    {order.scheduledDate.toLocaleDateString()}
-                  </td>
-                  <td className="py-3 text-sm">
-                    <div className="flex items-center gap-1">
-                      <button 
-                        className="p-1.5 rounded-md hover:bg-accent text-primary"
-                        onClick={() => handleStatusChange(order, 'Delivered')}
-                        title="Mark as Delivered"
-                      >
-                        <CheckCircle size={16} />
-                      </button>
-                      <button 
-                        className="p-1.5 rounded-md hover:bg-accent text-muted-foreground"
-                        onClick={() => handleStatusChange(order, 'In Transit')}
-                        title="Mark as In Transit"
-                      >
-                        <RefreshCw size={16} />
-                      </button>
-                      <button 
-                        className="p-1.5 rounded-md hover:bg-accent text-muted-foreground"
-                        onClick={() => handleDeleteOrder(order)}
-                        title="Delete Order"
-                      >
-                        <XCircle size={16} />
-                      </button>
-                    </div>
-                  </td>
+          {isSearching ? (
+            <div className="flex justify-center items-center h-40">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : displayedOrders.length > 0 ? (
+            <table className="w-full min-w-[800px]">
+              <thead>
+                <tr className="text-left border-b">
+                  <th className="pb-3 font-medium text-sm">Order ID</th>
+                  <th className="pb-3 font-medium text-sm">Customer</th>
+                  <th className="pb-3 font-medium text-sm">Items</th>
+                  <th className="pb-3 font-medium text-sm">Delivery Address</th>
+                  <th className="pb-3 font-medium text-sm">Status</th>
+                  <th className="pb-3 font-medium text-sm">Scheduled</th>
+                  <th className="pb-3 font-medium text-sm">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {displayedOrders.map((order, index) => (
+                  <tr key={order.id} className="border-b last:border-0 hover:bg-accent/20 transition-colors">
+                    <td className="py-3 text-sm font-medium">
+                      {order.id}
+                    </td>
+                    <td className="py-3 text-sm">
+                      {order.customer}
+                    </td>
+                    <td className="py-3 text-sm">
+                      {order.items} items
+                    </td>
+                    <td className="py-3 text-sm">
+                      {order.address}
+                    </td>
+                    <td className="py-3 text-sm">
+                      <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(order.status)}`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="py-3 text-sm">
+                      {order.scheduledDate.toLocaleDateString()}
+                    </td>
+                    <td className="py-3 text-sm">
+                      <div className="flex items-center gap-1">
+                        <button 
+                          className="p-1.5 rounded-md hover:bg-accent text-primary"
+                          onClick={() => handleStatusChange(order, 'Delivered')}
+                          title="Mark as Delivered"
+                        >
+                          <CheckCircle size={16} />
+                        </button>
+                        <button 
+                          className="p-1.5 rounded-md hover:bg-accent text-muted-foreground"
+                          onClick={() => handleStatusChange(order, 'In Transit')}
+                          title="Mark as In Transit"
+                        >
+                          <RefreshCw size={16} />
+                        </button>
+                        <button 
+                          className="p-1.5 rounded-md hover:bg-accent text-muted-foreground"
+                          onClick={() => handleDeleteOrder(order)}
+                          title="Delete Order"
+                        >
+                          <XCircle size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-40">
+              <PackageOpen className="h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No orders found matching your search criteria</p>
+              <Button 
+                variant="link" 
+                onClick={clearSearch}
+                className="mt-2"
+              >
+                Clear search
+              </Button>
+            </div>
+          )}
         </div>
         
         <div className="flex justify-between items-center mt-6 pt-4 border-t">
           <div className="text-sm text-muted-foreground">
-            Showing {(currentPage - 1) * ordersPerPage + 1}-{Math.min(currentPage * ordersPerPage, orders.length)} of {orders.length} results
+            {displayedOrders.length > 0 ? (
+              <>Showing {(currentPage - 1) * ordersPerPage + 1}-{Math.min(currentPage * ordersPerPage, filterOrders(orders, selectedFilter).filter(
+                order => order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        order.address.toLowerCase().includes(searchQuery.toLowerCase())
+              ).length)} of {filterOrders(orders, selectedFilter).filter(
+                order => order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        order.address.toLowerCase().includes(searchQuery.toLowerCase())
+              ).length} results</>
+            ) : (
+              <>No results found</>
+            )}
           </div>
-          <div className="flex items-center gap-1">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-8 w-8 p-0" 
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            >
-              &lt;
-            </Button>
-            {Array.from({ length: Math.min(3, totalPages) }).map((_, i) => {
-              const pageNumber = i + 1;
-              return (
-                <Button 
-                  key={i}
-                  variant="outline" 
-                  size="sm" 
-                  className={`h-8 w-8 p-0 ${currentPage === pageNumber ? 'bg-primary text-white' : ''}`}
-                  onClick={() => setCurrentPage(pageNumber)}
-                >
-                  {pageNumber}
-                </Button>
-              );
-            })}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-8 w-8 p-0"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            >
-              &gt;
-            </Button>
-          </div>
+          {displayedOrders.length > 0 && (
+            <div className="flex items-center gap-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-8 w-8 p-0" 
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              >
+                &lt;
+              </Button>
+              {Array.from({ length: Math.min(3, totalPages) }).map((_, i) => {
+                const pageNumber = i + 1;
+                return (
+                  <Button 
+                    key={i}
+                    variant="outline" 
+                    size="sm" 
+                    className={`h-8 w-8 p-0 ${currentPage === pageNumber ? 'bg-primary text-white' : ''}`}
+                    onClick={() => setCurrentPage(pageNumber)}
+                  >
+                    {pageNumber}
+                  </Button>
+                );
+              })}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-8 w-8 p-0"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              >
+                &gt;
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
