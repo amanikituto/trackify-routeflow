@@ -21,7 +21,23 @@ import { orders, filterOrders, Order } from '@/data/orderData';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { 
+  Form, 
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel 
+} from '@/components/ui/form';
+
+// Define the form values type
+interface OrderFormValues {
+  customer: string;
+  items: number;
+  address: string;
+  status: 'Processing' | 'In Transit' | 'Delivered' | 'Delayed';
+  scheduledDate: string;
+}
 
 const OrderManagement = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
@@ -31,6 +47,17 @@ const OrderManagement = () => {
   const [displayedOrders, setDisplayedOrders] = useState<Order[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
+  
+  // Initialize the form
+  const form = useForm<OrderFormValues>({
+    defaultValues: {
+      customer: '',
+      items: 1,
+      address: '',
+      status: 'Processing',
+      scheduledDate: new Date().toISOString().split('T')[0],
+    },
+  });
   
   const ordersPerPage = 10;
   const totalPages = Math.ceil(orders.length / ordersPerPage);
@@ -75,6 +102,27 @@ const OrderManagement = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const onSubmit = (data: OrderFormValues) => {
+    const newOrder: Order = {
+      id: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
+      customer: data.customer,
+      items: data.items,
+      address: data.address,
+      status: data.status,
+      scheduledDate: new Date(data.scheduledDate),
+    };
+    
+    orders.unshift(newOrder);
+    setDisplayedOrders([newOrder, ...displayedOrders].slice(0, ordersPerPage));
+    
+    toast({
+      title: "Order Created",
+      description: "New order has been added to the system",
+    });
+    
+    form.reset();
   };
 
   const getStatusColor = (status: Order['status']) => {
@@ -129,39 +177,92 @@ const OrderManagement = () => {
                 <SheetTitle>Add New Order</SheetTitle>
               </SheetHeader>
               <div className="space-y-4 py-4">
-                <FormItem>
-                  <FormLabel>Customer</FormLabel>
-                  <Input placeholder="Customer name" />
-                </FormItem>
-                <FormItem>
-                  <FormLabel>Number of Items</FormLabel>
-                  <Input type="number" placeholder="Number of items" min="1" />
-                </FormItem>
-                <FormItem>
-                  <FormLabel>Delivery Address</FormLabel>
-                  <Input placeholder="Delivery address" />
-                </FormItem>
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <select className="w-full rounded-md border border-input bg-transparent px-3 py-2">
-                    <option value="Processing">Processing</option>
-                    <option value="In Transit">In Transit</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Delayed">Delayed</option>
-                  </select>
-                </FormItem>
-                <FormItem>
-                  <FormLabel>Scheduled Date</FormLabel>
-                  <Input type="date" />
-                </FormItem>
-                <Button className="w-full mt-4" onClick={() => {
-                  toast({
-                    title: "Order Created",
-                    description: "New order has been added to the system",
-                  });
-                }}>
-                  Create Order
-                </Button>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="customer"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Customer</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Customer name" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="items"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Number of Items</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              placeholder="Number of items" 
+                              min="1" 
+                              {...field}
+                              onChange={e => field.onChange(parseInt(e.target.value))}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Delivery Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Delivery address" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Status</FormLabel>
+                          <FormControl>
+                            <select 
+                              className="w-full rounded-md border border-input bg-transparent px-3 py-2"
+                              {...field}
+                            >
+                              <option value="Processing">Processing</option>
+                              <option value="In Transit">In Transit</option>
+                              <option value="Delivered">Delivered</option>
+                              <option value="Delayed">Delayed</option>
+                            </select>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="scheduledDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Scheduled Date</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button type="submit" className="w-full mt-4">
+                      Create Order
+                    </Button>
+                  </form>
+                </Form>
               </div>
             </SheetContent>
           </Sheet>
