@@ -1,158 +1,133 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 220 33% 98%;
-    --foreground: 220 10% 15%;
-
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 220 10% 15%;
-
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 10% 15%;
-
-    --primary: 210 100% 50%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
     --primary-foreground: 210 40% 98%;
-
-    --secondary: 220 5% 96%;
-    --secondary-foreground: 220 10% 15%;
-
-    --muted: 220 5% 96%;
-    --muted-foreground: 220 5% 45%;
-
-    --accent: 220 100% 97%;
-    --accent-foreground: 210 100% 50%;
-
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 220 10% 90%;
-    --input: 220 10% 90%;
-    --ring: 210 100% 50%;
-
-    --radius: 0.6rem;
-
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 10% 15%;
-    --sidebar-primary: 210 100% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 100% 97%;
-    --sidebar-accent-foreground: 210 100% 50%;
-    --sidebar-border: 220 10% 90%;
-    --sidebar-ring: 210 100% 50%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+    --sidebar: 0 0% 100%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --sidebar-muted: 215.4 16.3% 46.9%;
+    --sidebar-muted-foreground: 215.4 16.3% 46.9%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 221.2 83.2% 53.3%;
   }
-
+  
   .dark {
-    --background: 220 30% 10%;
-    --foreground: 210 20% 98%;
-
-    --card: 220 25% 12%;
-    --card-foreground: 210 20% 98%;
-
-    --popover: 220 25% 12%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 210 100% 50%;
-    --primary-foreground: 210 20% 98%;
-
-    --secondary: 220 25% 16%;
-    --secondary-foreground: 210 20% 98%;
-
-    --muted: 220 25% 16%;
-    --muted-foreground: 220 10% 70%;
-
-    --accent: 220 25% 16%;
-    --accent-foreground: 210 100% 50%;
-
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-
-    --border: 220 25% 18%;
-    --input: 220 25% 18%;
-    --ring: 210 100% 50%;
-
-    --sidebar-background: 220 25% 12%;
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 210 100% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 25% 16%;
-    --sidebar-accent-foreground: 210 100% 50%;
-    --sidebar-border: 220 25% 18%;
-    --sidebar-ring: 210 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+    --sidebar: 222.2 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-muted: 217.2 32.6% 17.5%;
+    --sidebar-muted-foreground: 215 20.2% 65.1%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 224.3 76.3% 48%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
-    font-family: 'Inter', sans-serif;
   }
-
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
 
+/* Custom utilities */
+@layer utilities {
   .glass-morphism {
-    @apply bg-white/70 dark:bg-card/70 backdrop-blur-md border border-white/20 dark:border-white/5 shadow-glass;
-  }
-  
-  .neo-morphism {
-    @apply bg-secondary rounded-xl shadow-neo dark:bg-card dark:shadow-none dark:border dark:border-border;
+    @apply bg-white/50 dark:bg-gray-950/50 backdrop-blur-sm border border-gray-200 dark:border-gray-800;
   }
   
   .h1 {
-    @apply text-4xl font-bold tracking-tight lg:text-5xl;
+    @apply text-4xl font-bold tracking-tight;
   }
   
   .h2 {
-    @apply text-3xl font-semibold tracking-tight lg:text-4xl;
+    @apply text-3xl font-bold tracking-tight;
   }
   
   .h3 {
-    @apply text-2xl font-semibold tracking-tight lg:text-3xl;
+    @apply text-2xl font-bold tracking-tight;
   }
   
   .h4 {
-    @apply text-xl font-semibold tracking-tight lg:text-2xl;
+    @apply text-xl font-bold tracking-tight;
+  }
+}
+
+/* Animation utilities */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
   }
   
-  .p {
-    @apply leading-7;
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
   }
   
-  .subtle {
-    @apply text-sm text-muted-foreground;
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   
-  .page-transition-enter {
-    @apply animate-fade-in animate-slide-up;
-  }
-  
-  .section-transition {
-    @apply animate-scale-in;
-  }
-  
-  /* Scrollbar styling */
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    @apply bg-border rounded-full;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground;
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

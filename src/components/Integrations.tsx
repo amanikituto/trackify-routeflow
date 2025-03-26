@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LayoutGrid,
   ZapIcon,
@@ -8,10 +8,24 @@ import {
   MessageSquare,
   CreditCard,
   BarChart,
-  ExternalLink
+  ExternalLink,
+  CheckIcon,
+  AlertCircle
 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 import FeatureCard from './ui-components/FeatureCard';
 import CustomButton from './ui-components/Button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 const integrationCategories = [
   {
@@ -61,6 +75,53 @@ const integrationCategories = [
 ];
 
 const Integrations = () => {
+  const [showNewIntegrationDialog, setShowNewIntegrationDialog] = useState(false);
+  const [showManageConnectionsDialog, setShowManageConnectionsDialog] = useState(false);
+  const [selectedIntegration, setSelectedIntegration] = useState<{ name: string; category: string } | null>(null);
+  const [apiKey, setApiKey] = useState('');
+  
+  const handleConnectIntegration = (integration: string, category: string) => {
+    setSelectedIntegration({ name: integration, category });
+    setShowNewIntegrationDialog(true);
+  };
+
+  const handleSaveIntegration = () => {
+    if (!apiKey.trim()) {
+      toast({
+        title: "Error",
+        description: "API Key is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // In a real application, you would send this to your backend
+    toast({
+      title: "Integration Successful",
+      description: `Connected to ${selectedIntegration?.name}`,
+      variant: "default",
+    });
+    
+    setShowNewIntegrationDialog(false);
+    setApiKey('');
+  };
+
+  const handleDisconnectIntegration = (integration: string) => {
+    toast({
+      title: "Integration Disconnected",
+      description: `Disconnected from ${integration}`,
+      variant: "default",
+    });
+  };
+
+  const handleContactSupport = () => {
+    toast({
+      title: "Support Request Sent",
+      description: "Our team will contact you shortly about custom integration options.",
+      variant: "default",
+    });
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -72,6 +133,7 @@ const Integrations = () => {
           <CustomButton 
             size="sm" 
             variant="outline"
+            onClick={() => setShowManageConnectionsDialog(true)}
           >
             Manage Connections
           </CustomButton>
@@ -79,6 +141,7 @@ const Integrations = () => {
             size="sm" 
             variant="default"
             iconLeft={<ZapIcon size={16} />}
+            onClick={() => setShowNewIntegrationDialog(true)}
           >
             New Integration
           </CustomButton>
@@ -154,7 +217,13 @@ const Integrations = () => {
                         {integration.status}
                       </span>
                       <div className="mt-3">
-                        <button className="text-xs text-primary hover:text-primary/70 flex items-center gap-1">
+                        <button 
+                          className="text-xs text-primary hover:text-primary/70 flex items-center gap-1"
+                          onClick={() => integration.status === 'Connected' 
+                            ? handleDisconnectIntegration(integration.name)
+                            : handleConnectIntegration(integration.name, category.title)
+                          }
+                        >
                           {integration.status === 'Connected' ? 'Configure' : 'Connect'}
                           <ExternalLink size={12} />
                         </button>
@@ -178,10 +247,146 @@ const Integrations = () => {
         <CustomButton 
           variant="default" 
           iconRight={<ExternalLink size={16} />}
+          onClick={handleContactSupport}
         >
           Contact Support
         </CustomButton>
       </div>
+
+      {/* New Integration Dialog */}
+      <Dialog open={showNewIntegrationDialog} onOpenChange={setShowNewIntegrationDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{selectedIntegration ? `Connect to ${selectedIntegration.name}` : 'New Integration'}</DialogTitle>
+            <DialogDescription>
+              {selectedIntegration 
+                ? `Add your ${selectedIntegration.name} API credentials to connect your account.`
+                : 'Select an integration service to connect to your account.'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {selectedIntegration ? (
+              <>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="apiKey" className="text-right">
+                    API Key
+                  </Label>
+                  <Input
+                    id="apiKey"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="Enter your API key"
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="flex items-start space-x-2 text-sm text-muted-foreground">
+                  <AlertCircle size={16} className="mt-0.5" />
+                  <p>Your API key is securely encrypted and never shared.</p>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2">
+                {integrationCategories.map((category) => (
+                  <div key={category.title} className="mb-4">
+                    <h4 className="text-sm font-medium mb-2">{category.title}</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {category.integrations
+                        .filter(integration => integration.status === 'Available')
+                        .map(integration => (
+                          <Button 
+                            key={integration.name} 
+                            variant="outline" 
+                            className="justify-start"
+                            onClick={() => handleConnectIntegration(integration.name, category.title)}
+                          >
+                            <span className="mr-2">{integration.logo}</span>
+                            {integration.name}
+                          </Button>
+                        ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setShowNewIntegrationDialog(false);
+              setSelectedIntegration(null);
+              setApiKey('');
+            }}>
+              Cancel
+            </Button>
+            {selectedIntegration && (
+              <Button onClick={handleSaveIntegration}>Save</Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manage Connections Dialog */}
+      <Dialog open={showManageConnectionsDialog} onOpenChange={setShowManageConnectionsDialog}>
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>Manage Connections</DialogTitle>
+            <DialogDescription>
+              View and manage your current integration connections.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[400px] overflow-y-auto">
+            {integrationCategories.map((category) => {
+              const connectedIntegrations = category.integrations.filter(i => i.status === 'Connected');
+              if (connectedIntegrations.length === 0) return null;
+              
+              return (
+                <div key={category.title} className="mb-6">
+                  <h4 className="text-sm font-medium mb-2 flex items-center">
+                    <category.icon className="h-4 w-4 mr-1 text-primary" />
+                    {category.title}
+                  </h4>
+                  <div className="space-y-3">
+                    {connectedIntegrations.map(integration => (
+                      <div key={integration.name} className="flex items-center justify-between p-3 border rounded-md">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-md flex items-center justify-center text-lg bg-primary/10">
+                            {integration.logo}
+                          </div>
+                          <div>
+                            <p className="font-medium">{integration.name}</p>
+                            <p className="text-xs text-muted-foreground">Connected on June 15, 2023</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleConnectIntegration(integration.name, category.title)}
+                          >
+                            Configure
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDisconnectIntegration(integration.name)}
+                          >
+                            Disconnect
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <DialogFooter className="border-t pt-4">
+            <Button variant="outline" onClick={() => setShowManageConnectionsDialog(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
