@@ -13,6 +13,7 @@ import OrderManagement from "./components/OrderManagement";
 import Integrations from "./components/Integrations";
 import Security from "./components/Security";
 import Analytics from "./components/Analytics";
+import FleetManagement from "./components/fleet-management/FleetManagement";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/integrations" element={<Integrations />} />
             <Route path="/security" element={<Security />} />
+            <Route path="/fleet-management" element={<FleetManagement />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

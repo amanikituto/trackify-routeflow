@@ -10,7 +10,7 @@ import {
   Users,
   Settings,
   Menu,
-  TrendingUp,
+  Truck,
 } from 'lucide-react';
 import {
   Sidebar as SidebarComponent,
@@ -27,6 +27,7 @@ const navigationItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
   { name: 'Route Optimization', href: '/route-optimization', icon: Map },
   { name: 'Order Management', href: '/order-management', icon: PackageOpen },
+  { name: 'Fleet Management', href: '/fleet-management', icon: Truck },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Integrations', href: '/integrations', icon: LayoutGrid },
   { name: 'Security', href: '/security', icon: ShieldCheck },

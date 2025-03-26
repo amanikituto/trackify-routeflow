@@ -7,12 +7,15 @@ import {
   Users,
   BarChart3,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  Wrench,
+  Car
 } from 'lucide-react';
 import StatCard from './ui-components/StatCard';
 import Map from './ui-components/Map';
 import CustomButton from './ui-components/Button'; // Renamed to avoid conflict
 import Analytics from './Analytics';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   return (
@@ -26,8 +29,8 @@ const Dashboard = () => {
           <CustomButton size="sm" variant="outline">
             Export Report
           </CustomButton>
-          <CustomButton size="sm" variant="default">
-            Fleet Overview
+          <CustomButton size="sm" variant="default" as={Link} to="/fleet-management">
+            Fleet Management
           </CustomButton>
         </div>
       </div>
@@ -124,7 +127,12 @@ const Dashboard = () => {
           </div>
           
           <div className="mt-6 pt-6 border-t">
-            <h4 className="text-sm font-medium mb-3">Recent Alerts</h4>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-medium">Recent Alerts</h4>
+              <Link to="/fleet-management" className="text-xs text-primary hover:underline">
+                Manage Repairs
+              </Link>
+            </div>
             <div className="space-y-3">
               <div className="flex items-start gap-2">
                 <AlertCircle size={16} className="text-amber-500 mt-0.5" />
@@ -134,10 +142,17 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-start gap-2">
-                <AlertCircle size={16} className="text-blue-500 mt-0.5" />
+                <Wrench size={16} className="text-blue-500 mt-0.5" />
                 <div>
-                  <p className="text-sm">Warehouse #3 inventory low alert</p>
-                  <p className="text-xs text-muted-foreground">2 hours ago</p>
+                  <p className="text-sm">Repair job #REP-78 assigned to John</p>
+                  <p className="text-xs text-muted-foreground">1 hour ago</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <Car size={16} className="text-green-500 mt-0.5" />
+                <div>
+                  <p className="text-sm">Vehicle #VN-7821 back in service</p>
+                  <p className="text-xs text-muted-foreground">3 hours ago</p>
                 </div>
               </div>
             </div>
