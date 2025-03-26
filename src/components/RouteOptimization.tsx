@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Map as MapIcon,
   Route,
@@ -12,14 +12,119 @@ import {
   Plus,
   Check,
   X,
-  ChevronDown
+  ChevronDown,
+  Search,
+  Save
 } from 'lucide-react';
 import Map from './ui-components/Map';
 import CustomButton from './ui-components/Button';
 import StatCard from './ui-components/StatCard';
+import { routes, RouteInfo, RouteStop } from '@/data/routeData';
+import { toast } from "@/hooks/use-toast";
 
 const RouteOptimization = () => {
-  const [selectedRoute, setSelectedRoute] = useState<number | null>(1);
+  const [selectedRouteId, setSelectedRouteId] = useState<number>(1);
+  const [selectedRoute, setSelectedRoute] = useState<RouteInfo | null>(null);
+  const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [routeStops, setRouteStops] = useState<RouteStop[]>([]);
+  
+  // Stats data
+  const [statData, setStatData] = useState({
+    optimizedRoutes: 37,
+    avgTimeSaved: "27 min",
+    fuelSavings: "12.8%",
+    co2Reduction: "8.5 tons"
+  });
+
+  // Load the selected route data
+  useEffect(() => {
+    const route = routes.find(r => r.id === selectedRouteId);
+    if (route) {
+      setSelectedRoute(route);
+      setRouteStops(route.stops);
+    }
+  }, [selectedRouteId]);
+
+  const handleRouteSelection = (routeId: number) => {
+    setSelectedRouteId(routeId);
+    setIsDropdownOpen(false);
+  };
+
+  const handleRecalculate = () => {
+    setIsOptimizing(true);
+    
+    // Simulate optimization process
+    setTimeout(() => {
+      setIsOptimizing(false);
+      
+      if (selectedRoute) {
+        // Create a slightly modified route to simulate optimization
+        const optimizedRoute = { 
+          ...selectedRoute,
+          optimized: true,
+          totalDistance: (parseFloat(selectedRoute.totalDistance) * 0.85).toFixed(1) + " miles",
+          estimatedTime: Math.floor(parseInt(selectedRoute.estimatedTime) * 0.85) + "h " + 
+                         Math.floor(parseInt(selectedRoute.estimatedTime.split('h ')[1]) * 0.85) + "min"
+        };
+        
+        setSelectedRoute(optimizedRoute);
+        
+        // Update stats
+        setStatData(prev => ({
+          ...prev,
+          optimizedRoutes: prev.optimizedRoutes + 1,
+          fuelSavings: (parseFloat(prev.fuelSavings) + 0.3).toFixed(1) + "%"
+        }));
+        
+        toast({
+          title: "Route Optimized",
+          description: "Route has been successfully optimized, saving approximately 15% of time and distance.",
+        });
+      }
+    }, 2500);
+  };
+
+  const toggleStopCompletion = (stopId: number, completed: boolean) => {
+    setRouteStops(stops => 
+      stops.map(stop => 
+        stop.id === stopId ? { ...stop, completed } : stop
+      )
+    );
+    
+    toast({
+      title: completed ? "Stop Completed" : "Stop Marked Incomplete",
+      description: `Stop #${stopId} has been ${completed ? 'marked as completed' : 'marked as incomplete'}.`,
+    });
+  };
+
+  const handleSendToDrivers = () => {
+    toast({
+      title: "Routes Sent to Drivers",
+      description: "All drivers have been notified about their updated routes.",
+    });
+  };
+
+  const handleExportRoute = () => {
+    toast({
+      title: "Route Exported",
+      description: "Route data has been exported successfully.",
+    });
+  };
+  
+  const handleNewRoute = () => {
+    toast({
+      title: "New Route Creation",
+      description: "Opening route creation wizard...",
+    });
+  };
+
+  const handleMapClick = (lat: number, lng: number) => {
+    toast({
+      title: "Location Selected",
+      description: `Selected coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+    });
+  };
   
   return (
     <div className="space-y-8 animate-fade-in">
@@ -40,6 +145,7 @@ const RouteOptimization = () => {
             size="sm" 
             variant="default" 
             iconLeft={<Plus size={16} />}
+            onClick={handleNewRoute}
           >
             New Route
           </CustomButton>
@@ -49,14 +155,14 @@ const RouteOptimization = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           title="Optimized Routes" 
-          value="37" 
+          value={statData.optimizedRoutes.toString()} 
           icon={Route}
           trend={{ value: 12, isPositive: true }}
           className="animate-slide-up"
         />
         <StatCard 
           title="Avg. Time Saved" 
-          value="27 min" 
+          value={statData.avgTimeSaved} 
           icon={Clock}
           trend={{ value: 8, isPositive: true }}
           className="animate-slide-up"
@@ -64,7 +170,7 @@ const RouteOptimization = () => {
         />
         <StatCard 
           title="Fuel Savings" 
-          value="12.8%" 
+          value={statData.fuelSavings} 
           icon={Fuel}
           trend={{ value: 2.3, isPositive: true }}
           className="animate-slide-up"
@@ -72,7 +178,7 @@ const RouteOptimization = () => {
         />
         <StatCard 
           title="CO₂ Reduction" 
-          value="8.5 tons" 
+          value={statData.co2Reduction} 
           icon={TrendingDown}
           trend={{ value: 3.2, isPositive: true }}
           className="animate-slide-up"
@@ -86,21 +192,46 @@ const RouteOptimization = () => {
             <h3 className="text-lg font-medium">Route Visualization</h3>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <button className="text-sm flex items-center gap-2 px-3 py-1.5 rounded-md border hover:bg-accent">
-                  <span>Route #{selectedRoute}</span>
+                <button 
+                  className="text-sm flex items-center gap-2 px-3 py-1.5 rounded-md border hover:bg-accent"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  <span>{selectedRoute?.name || "Select Route"}</span>
                   <ChevronDown size={16} />
                 </button>
+                
+                {isDropdownOpen && (
+                  <div className="absolute top-full right-0 mt-1 w-48 bg-background rounded-md shadow-lg border z-10">
+                    {routes.map(route => (
+                      <button
+                        key={route.id}
+                        className="w-full text-left px-3 py-2 hover:bg-accent text-sm"
+                        onClick={() => handleRouteSelection(route.id)}
+                      >
+                        {route.name} {route.optimized && '(Optimized)'}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
+              
               <CustomButton 
                 size="sm" 
                 variant="outline" 
-                iconLeft={<RefreshCw size={14} />}
+                iconLeft={<RefreshCw size={14} className={isOptimizing ? "animate-spin" : ""} />}
+                onClick={handleRecalculate}
+                disabled={isOptimizing}
               >
-                Recalculate
+                {isOptimizing ? "Optimizing..." : "Recalculate"}
               </CustomButton>
             </div>
           </div>
-          <Map className="h-[400px]" />
+          
+          <Map 
+            className="h-[400px]" 
+            routeData={selectedRoute || undefined}
+            onMapClick={handleMapClick}
+          />
         </div>
         
         <div className="glass-morphism rounded-xl p-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
@@ -109,51 +240,81 @@ const RouteOptimization = () => {
             <div className="flex flex-col gap-2 p-3 rounded-lg bg-accent/50">
               <div className="flex justify-between">
                 <span className="text-sm font-medium">Route Summary</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800">Optimized</span>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                  selectedRoute?.optimized 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {selectedRoute?.optimized ? 'Optimized' : 'Standard'}
+                </span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>Total Distance:</div>
-                <div className="font-medium">47.3 miles</div>
+                <div className="font-medium">{selectedRoute?.totalDistance || "N/A"}</div>
                 <div>Estimated Time:</div>
-                <div className="font-medium">2h 15min</div>
+                <div className="font-medium">{selectedRoute?.estimatedTime || "N/A"}</div>
                 <div>Delivery Stops:</div>
-                <div className="font-medium">14</div>
+                <div className="font-medium">{selectedRoute?.deliveryStops || "N/A"}</div>
                 <div>Time Window:</div>
-                <div className="font-medium">8AM - 3PM</div>
+                <div className="font-medium">{selectedRoute?.timeWindow || "N/A"}</div>
               </div>
             </div>
             
             <div>
-              <h4 className="text-sm font-medium mb-3">Delivery Sequence</h4>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-medium">Delivery Sequence</h4>
+                <div className="relative">
+                  <div className="flex items-center gap-2 px-2 py-1 rounded-md border text-xs">
+                    <Search size={12} />
+                    <span>Filter</span>
+                  </div>
+                </div>
+              </div>
+              
               <div className="space-y-4 max-h-[260px] overflow-y-auto pr-2">
-                {Array.from({ length: 6 }).map((_, index) => (
+                {routeStops.map((stop, index) => (
                   <div 
-                    key={index}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-background border"
+                    key={stop.id}
+                    className={`flex items-start gap-3 p-3 rounded-lg ${
+                      stop.completed 
+                      ? 'bg-accent/40 border-accent' 
+                      : 'bg-background border'
+                    }`}
                   >
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs">
+                    <div className={`flex items-center justify-center w-6 h-6 rounded-full ${
+                      stop.completed 
+                      ? 'bg-blue-500' 
+                      : 'bg-primary'
+                    } text-white text-xs`}>
                       {index + 1}
                     </div>
                     <div className="flex-1">
                       <div className="text-sm font-medium">
-                        Customer {Math.floor(1000 + Math.random() * 9000)}
+                        {stop.customerName}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {index % 2 === 0 ? '123 Main St, City' : '456 Oak Ave, Town'}
+                        {stop.address}
                       </div>
                       <div className="flex items-center gap-2 mt-1">
-                        <div className="text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
-                          {index % 3 === 0 ? 'Priority' : index % 3 === 1 ? 'Regular' : 'Express'}
+                        <div className={`text-xs px-1.5 py-0.5 rounded ${
+                          stop.priority === 'Priority' 
+                            ? 'bg-red-100 text-red-800' 
+                            : stop.priority === 'Express' 
+                              ? 'bg-purple-100 text-purple-800' 
+                              : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {stop.priority}
                         </div>
-                        <div className="text-xs">ETA: {9 + index}:{index < 30 ? '00' : '30'} AM</div>
+                        <div className="text-xs">ETA: {stop.eta}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button className="p-1 rounded-full hover:bg-accent text-green-500">
-                        <Check size={16} />
-                      </button>
-                      <button className="p-1 rounded-full hover:bg-accent text-red-500">
-                        <X size={16} />
+                      <button 
+                        className={`p-1 rounded-full hover:bg-accent ${stop.completed ? 'text-blue-500' : 'text-green-500'}`}
+                        onClick={() => toggleStopCompletion(stop.id, !stop.completed)}
+                        title={stop.completed ? "Mark as incomplete" : "Mark as completed"}
+                      >
+                        {stop.completed ? <X size={16} /> : <Check size={16} />}
                       </button>
                     </div>
                   </div>
@@ -163,10 +324,18 @@ const RouteOptimization = () => {
           </div>
           
           <div className="mt-6 pt-4 border-t flex justify-between">
-            <CustomButton size="sm" variant="outline">
+            <CustomButton 
+              size="sm" 
+              variant="outline"
+              onClick={handleExportRoute}
+            >
               Export Route
             </CustomButton>
-            <CustomButton size="sm" variant="default">
+            <CustomButton 
+              size="sm" 
+              variant="default"
+              onClick={handleSendToDrivers}
+            >
               Send to Drivers
             </CustomButton>
           </div>
@@ -191,7 +360,7 @@ const RouteOptimization = () => {
               return (
                 <div key={index} className="relative flex flex-col items-center group">
                   <div 
-                    className="w-12 bg-primary/20 hover:bg-primary/30 rounded-t transition-all"
+                    className="w-12 bg-primary/20 hover:bg-primary/30 rounded-t transition-all cursor-pointer"
                     style={{ height: `${height}%` }}
                   >
                     <div
@@ -210,7 +379,7 @@ const RouteOptimization = () => {
         </div>
         
         <div className="mt-4 pt-4 border-t">
-          <div className="flex justify-between">
+          <div className="flex flex-wrap justify-between gap-2">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-primary"></div>
               <span className="text-xs">Optimized Routes</span>
