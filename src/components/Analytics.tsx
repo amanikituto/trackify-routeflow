@@ -125,41 +125,45 @@ const Analytics = () => {
             <CardContent className="pt-2">
               <div className="h-[300px]">
                 <ChartContainer id="daily-stats" config={chartConfig}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="date" 
-                    tick={{ fontSize: 12 }} 
-                    tickMargin={10}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                  />
-                  <YAxis 
-                    axisLine={{ stroke: '#e5e7eb' }}
-                    tick={{ fontSize: 12 }}
-                    tickMargin={10}
-                  />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Legend wrapperStyle={{ marginTop: '10px' }} />
-                  <Bar 
-                    type="monotone" 
-                    dataKey="deliveries" 
-                    name="deliveries" 
-                    fill="var(--color-deliveries)" 
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <Bar 
-                    type="monotone" 
-                    dataKey="onTime" 
-                    name="onTime" 
-                    fill="var(--color-onTime)" 
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <Bar 
-                    type="monotone" 
-                    dataKey="delayed" 
-                    name="delayed" 
-                    fill="var(--color-delayed)"
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={dailyStats}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{ fontSize: 12 }} 
+                        tickMargin={10}
+                        axisLine={{ stroke: '#e5e7eb' }}
+                      />
+                      <YAxis 
+                        axisLine={{ stroke: '#e5e7eb' }}
+                        tick={{ fontSize: 12 }}
+                        tickMargin={10}
+                      />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Legend wrapperStyle={{ marginTop: '10px' }} />
+                      <Bar 
+                        type="monotone" 
+                        dataKey="deliveries" 
+                        name="deliveries" 
+                        fill="var(--color-deliveries)" 
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar 
+                        type="monotone" 
+                        dataKey="onTime" 
+                        name="onTime" 
+                        fill="var(--color-onTime)" 
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar 
+                        type="monotone" 
+                        dataKey="delayed" 
+                        name="delayed" 
+                        fill="var(--color-delayed)"
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </ChartContainer>
               </div>
             </CardContent>
