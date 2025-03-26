@@ -12,15 +12,17 @@ interface StatCardProps {
     isPositive: boolean;
   };
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const StatCard = ({ title, value, icon: Icon, trend, className }: StatCardProps) => {
+const StatCard = ({ title, value, icon: Icon, trend, className, style }: StatCardProps) => {
   return (
     <div 
       className={cn(
         "glass-morphism p-6 rounded-xl",
         className
       )}
+      style={style}
     >
       <div className="flex justify-between items-start mb-4">
         <div>
