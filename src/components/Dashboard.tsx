@@ -12,6 +12,7 @@ import {
 import StatCard from './ui-components/StatCard';
 import Map from './ui-components/Map';
 import CustomButton from './ui-components/Button'; // Renamed to avoid conflict
+import Analytics from './Analytics';
 
 const Dashboard = () => {
   return (
@@ -64,6 +65,8 @@ const Dashboard = () => {
           style={{ animationDelay: '300ms' }}
         />
       </div>
+      
+      <Analytics />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 glass-morphism rounded-xl p-4 animate-slide-up" style={{ animationDelay: '100ms' }}>

@@ -10,6 +10,7 @@ import {
   Users,
   Settings,
   Menu,
+  TrendingUp,
 } from 'lucide-react';
 import {
   Sidebar as SidebarComponent,
@@ -23,7 +24,7 @@ import {
 } from '@/components/ui/sidebar';
 
 const navigationItems = [
-  { name: 'Dashboard', href: '/', icon: LayoutGrid },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
   { name: 'Route Optimization', href: '/route-optimization', icon: Map },
   { name: 'Order Management', href: '/order-management', icon: PackageOpen },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },

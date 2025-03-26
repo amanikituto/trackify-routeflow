@@ -12,6 +12,7 @@ import RouteOptimization from "./components/RouteOptimization";
 import OrderManagement from "./components/OrderManagement";
 import Integrations from "./components/Integrations";
 import Security from "./components/Security";
+import Analytics from "./components/Analytics";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/route-optimization" element={<RouteOptimization />} />
             <Route path="/order-management" element={<OrderManagement />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route path="/integrations" element={<Integrations />} />
             <Route path="/security" element={<Security />} />
           </Route>
