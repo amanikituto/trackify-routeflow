@@ -11,9 +11,23 @@ import {
   ChevronRight,
   BarChart,
   Terminal,
-  MapPin
+  MapPin,
+  Star,
+  Award,
+  Heart,
+  Image
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import FeatureCard from '@/components/ui-components/FeatureCard';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -27,11 +41,86 @@ const Index = () => {
     
     return () => clearTimeout(timer);
   }, []);
+
+  const testimonials = [
+    {
+      name: "Sarah Thompson",
+      position: "Logistics Manager, CompanyOne",
+      content: "Implementing this platform has transformed our delivery operations. We've seen a 35% decrease in delivery times and significant cost savings.",
+      avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80",
+      rating: 5
+    },
+    {
+      name: "Michael Rodriguez",
+      position: "Fleet Director, LogisticsPro",
+      content: "The real-time tracking and AI-powered route optimization have been game changers for our business. Our drivers are happier and our customers more satisfied.",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80",
+      rating: 5
+    },
+    {
+      name: "Jennifer Lee",
+      position: "Operations Director, ShipFast",
+      content: "The integration with our existing systems was seamless. The analytics dashboard provides insights that help us make better business decisions every day.",
+      avatar: "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80",
+      rating: 4
+    }
+  ];
+
+  const features = [
+    {
+      icon: TrendingUp,
+      title: "Real-time Tracking & Monitoring",
+      description: "Live GPS tracking, automated alerts, and performance analytics.",
+      delay: 0,
+      image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+    },
+    {
+      icon: Route,
+      title: "AI-Powered Route Optimization",
+      description: "Reduce fuel costs and delivery times using intelligent algorithms.",
+      delay: 100,
+      image: "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+    },
+    {
+      icon: PackageOpen,
+      title: "Automated Order Management",
+      description: "Ensure accurate stock levels and reduce human errors.",
+      delay: 200,
+      image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+    },
+    {
+      icon: Layers,
+      title: "Multi-Platform Integration",
+      description: "Seamlessly connect with ERP, CRM, and third-party logistics providers.",
+      delay: 300,
+      image: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+    },
+    {
+      icon: Cloud,
+      title: "Cloud-Based & Scalable",
+      description: "Accessible from anywhere, adaptable for businesses of all sizes.",
+      delay: 400,
+      image: "https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?auto=format&fit=crop&q=80&w=1170&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    },
+    {
+      icon: ShieldCheck,
+      title: "Robust Security & Compliance",
+      description: "Meeting global industry standards for data security and regulatory compliance.",
+      delay: 500,
+      image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+    }
+  ];
+
+  const renderStars = (rating) => {
+    return Array(rating).fill(0).map((_, i) => (
+      <Star key={i} className="h-4 w-4 text-amber-500 fill-amber-500" />
+    ));
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
-      <section className="py-16 px-4 md:px-6 lg:px-8 animate-fade-in">
+      <section className="py-16 px-4 md:px-6 lg:px-8 animate-fade-in bg-gradient-to-b from-background to-accent/10">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-12">
             <div className="lg:w-1/2 space-y-6">
@@ -67,6 +156,7 @@ const Index = () => {
                   variant="outline" 
                   className="rounded-lg h-12 px-6"
                 >
+                  <Image className="mr-2 h-4 w-4" />
                   <span>Watch Demo</span>
                 </Button>
               </div>
@@ -93,6 +183,11 @@ const Index = () => {
             <div className="lg:w-1/2 relative">
               <div className={`relative w-full h-[400px] md:h-[500px] rounded-xl overflow-hidden transform transition-all duration-1000 ${isLoaded ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-8 opacity-0 scale-95'}`}>
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl"></div>
+                <img 
+                  src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                  alt="Logistics map view"
+                  className="absolute inset-0 w-full h-full object-cover rounded-xl opacity-30"
+                />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-3/4 aspect-video glass-morphism rounded-xl overflow-hidden shadow-2xl flex items-center justify-center">
                     <div className="text-center p-8">
@@ -129,6 +224,32 @@ const Index = () => {
         </div>
       </section>
       
+      {/* Statistics */}
+      <section className="py-12 px-4 md:px-6 lg:px-8 section-transition">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { label: "Vehicles Managed", value: "10,000+", icon: <Award className="h-6 w-6 text-primary" /> },
+              { label: "Deliveries Optimized", value: "1M+", icon: <TrendingUp className="h-6 w-6 text-primary" /> },
+              { label: "Fuel Saved", value: "30%", icon: <Cloud className="h-6 w-6 text-primary" /> },
+              { label: "Customer Satisfaction", value: "98%", icon: <Heart className="h-6 w-6 text-primary" /> }
+            ].map((stat, index) => (
+              <div 
+                key={index} 
+                className="glass-morphism p-6 rounded-xl text-center shadow-sm transform hover:-translate-y-1 transition-all duration-300 section-transition"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+                  {stat.icon}
+                </div>
+                <h4 className="text-2xl font-bold">{stat.value}</h4>
+                <p className="text-sm text-muted-foreground">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      
       {/* Features Section */}
       <section className="py-16 px-4 md:px-6 lg:px-8 bg-accent/30">
         <div className="max-w-6xl mx-auto space-y-12">
@@ -139,66 +260,116 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: TrendingUp,
-                title: "Real-time Tracking & Monitoring",
-                description: "Live GPS tracking, automated alerts, and performance analytics.",
-                delay: 0
-              },
-              {
-                icon: Route,
-                title: "AI-Powered Route Optimization",
-                description: "Reduce fuel costs and delivery times using intelligent algorithms.",
-                delay: 100
-              },
-              {
-                icon: PackageOpen,
-                title: "Automated Order Management",
-                description: "Ensure accurate stock levels and reduce human errors.",
-                delay: 200
-              },
-              {
-                icon: Layers,
-                title: "Multi-Platform Integration",
-                description: "Seamlessly connect with ERP, CRM, and third-party logistics providers.",
-                delay: 300
-              },
-              {
-                icon: Cloud,
-                title: "Cloud-Based & Scalable",
-                description: "Accessible from anywhere, adaptable for businesses of all sizes.",
-                delay: 400
-              },
-              {
-                icon: ShieldCheck,
-                title: "Robust Security & Compliance",
-                description: "Meeting global industry standards for data security and regulatory compliance.",
-                delay: 500
-              }
-            ].map((feature, index) => (
-              <div 
-                key={index} 
-                className="glass-morphism p-6 rounded-xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1 section-transition"
-                style={{ animationDelay: `${feature.delay}ms` }}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <feature.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-lg">{feature.title}</h3>
-                </div>
-                <p className="text-muted-foreground">{feature.description}</p>
+          <Tabs defaultValue="features" className="w-full">
+            <TabsList className="mx-auto flex justify-center mb-8">
+              <TabsTrigger value="features">Features Overview</TabsTrigger>
+              <TabsTrigger value="showcase">Visual Showcase</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="features" className="w-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {features.map((feature, index) => (
+                  <FeatureCard 
+                    key={index} 
+                    icon={feature.icon}
+                    title={feature.title}
+                    description={feature.description}
+                    className="section-transition"
+                    style={{ animationDelay: `${feature.delay}ms` }}
+                  />
+                ))}
               </div>
-            ))}
+            </TabsContent>
+            
+            <TabsContent value="showcase" className="w-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {features.map((feature, index) => (
+                  <div 
+                    key={index}
+                    className="group relative overflow-hidden rounded-xl h-[250px] shadow-md hover:shadow-xl transition-all duration-300"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <img 
+                      src={feature.image} 
+                      alt={feature.title}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 rounded-lg bg-primary/20 backdrop-blur-sm">
+                          <feature.icon className="h-4 w-4 text-white" />
+                        </div>
+                        <h3 className="text-white font-semibold">{feature.title}</h3>
+                      </div>
+                      <p className="text-white/80 text-sm">{feature.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </section>
+      
+      {/* Testimonials */}
+      <section className="py-16 px-4 md:px-6 lg:px-8 bg-gradient-to-b from-background to-accent/5">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="text-center space-y-4">
+            <h2 className="text-3xl md:text-4xl font-bold">What Our Clients Say</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Trusted by businesses of all sizes around the world
+            </p>
           </div>
+          
+          <Carousel className="w-full max-w-5xl mx-auto p-4">
+            <CarouselContent>
+              {testimonials.map((testimonial, index) => (
+                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                  <Card className="glass-morphism border-0">
+                    <CardContent className="p-6">
+                      <div className="flex flex-col h-full">
+                        <div className="flex items-center gap-4 mb-4">
+                          <img 
+                            src={testimonial.avatar} 
+                            alt={testimonial.name}
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                          <div>
+                            <h4 className="font-semibold">{testimonial.name}</h4>
+                            <p className="text-xs text-muted-foreground">{testimonial.position}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex mb-2">
+                          {renderStars(testimonial.rating)}
+                        </div>
+                        
+                        <p className="text-muted-foreground">{testimonial.content}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center mt-6">
+              <CarouselPrevious className="relative static translate-x-0 translate-y-0 mr-2" />
+              <CarouselNext className="relative static translate-x-0 translate-y-0" />
+            </div>
+          </Carousel>
         </div>
       </section>
       
       {/* CTA Section */}
       <section className="py-16 px-4 md:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto glass-morphism rounded-2xl overflow-hidden relative section-transition">
+          <div className="absolute inset-0">
+            <img 
+              src="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+              alt="Logistics background"
+              className="w-full h-full object-cover opacity-10"
+            />
+          </div>
           <div className="absolute inset-0 bg-primary/5"></div>
           <div className="relative z-10 p-8 md:p-12">
             <div className="flex flex-col md:flex-row md:items-center gap-8">

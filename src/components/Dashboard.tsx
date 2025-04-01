@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Truck,
@@ -16,6 +15,7 @@ import Map from './ui-components/Map';
 import CustomButton from './ui-components/Button'; // Renamed to avoid conflict
 import Analytics from './Analytics';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const Dashboard = () => {
   return (
@@ -29,9 +29,9 @@ const Dashboard = () => {
           <CustomButton size="sm" variant="outline">
             Export Report
           </CustomButton>
-          <CustomButton size="sm" variant="default" as={Link} to="/fleet-management">
-            Fleet Management
-          </CustomButton>
+          <Button size="sm" variant="default" asChild>
+            <Link to="/fleet-management">Fleet Management</Link>
+          </Button>
         </div>
       </div>
       
